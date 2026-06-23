@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador TikTok Shop — 4U Marketplace</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #FE2C55;
+    --red-light: #fff0f3;
+    --red-border: #ffc0cb;
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --surface2: #f5f5f7;
+    --border: rgba(0,0,0,0.09);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a1a;
+    --text2: #555;
+    --text3: #888;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.16);
+      --text: #f0f0f0;
+      --text2: #aaa;
+      --text3: #666;
+      --success: #4ade80;
+      --success-bg: #052e16;
+      --danger: #f87171;
+      --danger-bg: #450a0a;
+      --warning: #fbbf24;
+      --warning-bg: #422006;
+      --red-light: #2a0a10;
+      --red-border: #7f1d2a;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── TELA DE SENHA ── */
+  #lock-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .lock-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+
+  .lock-logo {
+    width: 56px;
+    height: 56px;
+    background: var(--red);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .lock-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .lock-sub {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 28px;
+  }
+
+  .lock-label {
+    font-size: 12px;
+    color: var(--text2);
+    text-align: left;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .lock-input-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  #senha-input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 22px;
+    letter-spacing: 8px;
+    text-align: center;
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  #senha-input:focus { border-color: var(--red); }
+
+  .lock-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .lock-btn:hover { opacity: .88; }
+  .lock-btn:active { opacity: .75; }
+
+  .lock-erro {
+    font-size: 13px;
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 12px;
+    display: none;
+  }
+  .lock-erro.show { display: block; }
+
+  /* ── SIMULADOR ── */
+  #app { display: none; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-logo-box {
+    width: 34px;
+    height: 34px;
+    background: var(--red);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-sub {
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .sair-btn {
+    font-size: 12px;
+    color: var(--text3);
+    background: none;
+    border: 0.5px solid var(--border2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .sair-btn:hover { background: var(--surface2); }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .field-grid { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; color: var(--text2); }
+  .field-hint { font-size: 11px; color: var(--text3); }
+
+  .inp-wrap { position: relative; display: flex; align-items: center; }
+  .inp-pre { position: absolute; left: 10px; font-size: 13px; color: var(--text3); pointer-events: none; }
+  .inp-suf { position: absolute; right: 10px; font-size: 13px; color: var(--text3); pointer-events: none; }
+
+  input[type=number] {
+    width: 100%;
+    height: 38px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    -moz-appearance: textfield;
+    transition: border-color .12s;
+  }
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type=number]:focus { border-color: var(--red); }
+  .inp-wrap.pre input { padding: 0 10px 0 28px; }
+  .inp-wrap.suf input { padding: 0 28px 0 10px; }
+  .inp-wrap.bare input { padding: 0 10px; }
+
+  .canal-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .cbtn {
+    padding: 8px 6px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.4;
+    transition: all .12s;
+  }
+  .cbtn.active {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red);
+    font-weight: 600;
+  }
+  .cbtn small { font-size: 10px; color: var(--text3); display: block; margin-top: 2px; }
+  .cbtn.active small { color: var(--red); opacity: .75; }
+
+  .preco-destaque input {
+    height: 48px;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: right;
+    padding-right: 42px !important;
+  }
+
+  .alerta {
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .alerta.show { display: flex; }
+  .alerta.danger { background: var(--danger-bg); color: var(--danger); border: 0.5px solid var(--danger); }
+  .alerta.warning { background: var(--warning-bg); color: var(--warning); border: 0.5px solid var(--warning); }
+  .alerta-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    .metrics { grid-template-columns: 1fr 1fr; }
+  }
+
+  .metric {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .metric-value { font-size: 20px; font-weight: 600; color: var(--text); }
+  .metric-value.pos { color: var(--success); }
+  .metric-value.neg { color: var(--danger); }
+  .metric-value.warn { color: var(--warning); }
+
+  .breakdown { border-top: 0.5px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 0; }
+  .brow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 13px;
+  }
+  .brow:last-child { border-bottom: none; }
+  .brow-label { color: var(--text2); }
+  .brow-val { font-weight: 500; color: var(--text); }
+  .brow-val.ded { color: var(--danger); }
+  .brow-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .brow-total-val { font-size: 18px; font-weight: 700; }
+  .brow-total-val.pos { color: var(--success); }
+  .brow-total-val.neg { color: var(--danger); }
+  .brow-total-val.warn { color: var(--warning); }
+
+  .badge-faixa {
+    display: inline-block;
+    background: var(--red-light);
+    color: var(--red);
+    border: 0.5px solid var(--red-border);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .breakeven-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    padding-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ TELA DE SENHA ══ -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo">4U<br>MKT</div>
+    <div class="lock-title">Simulador TikTok Shop</div>
+    <div class="lock-sub">4U Marketplace — acesso restrito</div>
+    <label class="lock-label" for="senha-input">Digite a senha de acesso</label>
+    <div class="lock-input-wrap">
+      <input type="password" id="senha-input" maxlength="6" placeholder="••••" autocomplete="off"
+        onkeydown="if(event.key==='Enter')verificar()">
+    </div>
+    <button class="lock-btn" onclick="verificar()">Entrar</button>
+    <div class="lock-erro" id="lock-erro">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- ══ SIMULADOR ══ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-box">4U<br>MKT</div>
+      <div>
+        <div class="topbar-title">Simulador de Preço</div>
+        <div class="topbar-sub">TikTok Shop · 4U Marketplace</div>
+      </div>
+    </div>
+    <button class="sair-btn" onclick="sair()">Sair</button>
+  </div>
+
+  <div class="container">
+
+    <!-- Custos -->
+    <div class="card">
+      <div class="card-title">Custos do produto</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Custo da mercadoria</label>
+          <div class="inp-wrap pre">
+            <span class="inp-pre">R$</span>
+            <input type="number" id="custo" value="50" min="0" step="0.01" oninput="calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Custo fixo rateado</label>
+          <div class="inp-wrap pre">
+            <span class="inp-pre">R$</span>
+            <input type="number" id="fixo" value="10" min="0" step="0.01" oninput="calc()">
+          </div>
+          <div class="field-hint">Embalagem, frete, operação…</div>
+        </div>
+        <div class="field">
+          <label>Imposto sobre venda</label>
+          <div class="inp-wrap suf">
+            <span class="inp-suf">%</span>
+            <input type="number" id="imposto" value="4" min="0" max="100" step="0.1" oninput="calc()">
+          </div>
+          <div class="field-hint">Simples, MEI, lucro presumido…</div>
+        </div>
+        <div class="field">
+          <label>Outros custos variáveis</label>
+          <div class="inp-wrap suf">
+            <span class="inp-suf">%</span>
+            <input type="number" id="outros" value="0" min="0" max="100" step="0.1" oninput="calc()">
+          </div>
+          <div class="field-hint">% sobre o preço de venda</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canal -->
+    <div class="card">
+      <div class="card-title">TikTok Shop — taxas do canal</div>
+      <div class="canal-toggle">
+        <button class="cbtn active" id="btn1" onclick="setFaixa(1)">
+          Faixa &lt; R$50
+          <small>Comissão 10% + R$4/item</small>
+        </button>
+        <button class="cbtn" id="btn2" onclick="setFaixa(2)">
+          Faixa ≥ R$50
+          <small>Comissão 6% + R$6/item</small>
+        </button>
+        <button class="cbtn" id="btn0" onclick="setFaixa(0)">
+          Personalizado
+          <small>edite os campos</small>
+        </button>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>% de comissão do canal</label>
+          <div class="inp-wrap suf">
+            <span class="inp-suf">%</span>
+            <input type="number" id="comissao" value="10" min="0" max="100" step="0.1" oninput="setFaixa(0);calc()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Taxa fixa por item vendido</label>
+          <div class="inp-wrap pre">
+            <span class="inp-pre">R$</span>
+            <input type="number" id="taxa_fixa" value="4" min="0" step="0.01" oninput="setFaixa(0);calc()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preço de venda -->
+    <div class="card">
+      <div class="card-title">Preço de venda ao consumidor</div>
+      <div class="field">
+        <div class="inp-wrap suf preco-destaque">
+          <span class="inp-suf" style="font-size:15px;font-weight:600;right:14px;">R$</span>
+          <input type="number" id="preco_venda" value="120" min="0" step="0.01" oninput="calc()" style="padding-left:14px!important;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerta -->
+    <div class="alerta danger" id="alerta-danger">
+      <span class="alerta-icon">&#9888;</span>
+      <span id="alerta-danger-txt"></span>
+    </div>
+    <div class="alerta warning" id="alerta-warning">
+      <span class="alerta-icon">&#9888;</span>
+      <span id="alerta-warning-txt"></span>
+    </div>
+
+    <!-- Resultado -->
+    <div class="card">
+      <div class="card-title">
+        Resultado
+        <span class="badge-faixa" id="badge-faixa">Faixa &lt; R$50</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Lucro líquido</div>
+          <div class="metric-value" id="r-lucro">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Margem líquida</div>
+          <div class="metric-value" id="r-margem">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Total deduções</div>
+          <div class="metric-value" id="r-deducoes">—</div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="brow"><span class="brow-label">Preço de venda</span><span class="brow-val" id="b-venda">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Custo da mercadoria</span><span class="brow-val ded" id="b-custo">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Custo fixo rateado</span><span class="brow-val ded" id="b-fixo">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Imposto sobre venda</span><span class="brow-val ded" id="b-imposto">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Comissão TikTok Shop</span><span class="brow-val ded" id="b-comissao">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Taxa fixa por item</span><span class="brow-val ded" id="b-taxa">—</span></div>
+        <div class="brow"><span class="brow-label">(-) Outros custos variáveis</span><span class="brow-val ded" id="b-outros">—</span></div>
+        <div class="brow-total">
+          <span>Lucro líquido</span>
+          <span class="brow-total-val" id="b-lucro-total">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breakeven -->
+    <div class="card">
+      <div class="card-title">Referências de preço</div>
+      <div class="breakeven-grid">
+        <div class="metric">
+          <div class="metric-label">Preço mínimo (breakeven)</div>
+          <div class="metric-value" id="r-breakeven">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Preço para 20% de margem</div>
+          <div class="metric-value" id="r-meta20">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Preço para 30% de margem</div>
+          <div class="metric-value" id="r-meta30">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Preço para 40% de margem</div>
+          <div class="metric-value" id="r-meta40">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">4U Marketplace · Simulador TikTok Shop · Uso interno</div>
+
+  </div>
+</div>
+
+<script>
+  const SENHA = '5087';
+  let faixaAtual = 1;
+  let tentativas = 0;
+
+  function verificar() {
+    const v = document.getElementById('senha-input').value;
+    if (v === SENHA) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      calc();
+    } else {
+      tentativas++;
+      const el = document.getElementById('lock-erro');
+      el.classList.add('show');
+      el.textContent = tentativas >= 3
+        ? 'Senha incorreta. Verifique com o administrador.'
+        : 'Senha incorreta. Tente novamente.';
+      document.getElementById('senha-input').value = '';
+      document.getElementById('senha-input').focus();
+    }
+  }
+
+  function sair() {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('lock-screen').style.display = 'flex';
+    document.getElementById('senha-input').value = '';
+    document.getElementById('lock-erro').classList.remove('show');
+    tentativas = 0;
+  }
+
+  function setFaixa(f) {
+    faixaAtual = f;
+    document.getElementById('btn1').classList.toggle('active', f === 1);
+    document.getElementById('btn2').classList.toggle('active', f === 2);
+    document.getElementById('btn0').classList.toggle('active', f === 0);
+    if (f === 1) { document.getElementById('comissao').value = 10; document.getElementById('taxa_fixa').value = 4; }
+    if (f === 2) { document.getElementById('comissao').value = 6;  document.getElementById('taxa_fixa').value = 6; }
+    calc();
+  }
+
+  function brl(v) {
+    return 'R$ ' + Math.abs(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+  function pct(v) { return v.toFixed(1).replace('.', ',') + '%'; }
+
+  function precoMeta(margem, custosFixos, totalPctDed) {
+    const denom = 1 - (totalPctDed + margem) / 100;
+    return denom > 0 ? custosFixos / denom : Infinity;
+  }
+
+  function calc() {
+    const custo     = parseFloat(document.getElementById('custo').value) || 0;
+    const fixo      = parseFloat(document.getElementById('fixo').value) || 0;
+    const impPct    = parseFloat(document.getElementById('imposto').value) || 0;
+    const comPct    = parseFloat(document.getElementById('comissao').value) || 0;
+    const taxaFixa  = parseFloat(document.getElementById('taxa_fixa').value) || 0;
+    const outrosPct = parseFloat(document.getElementById('outros').value) || 0;
+    const venda     = parseFloat(document.getElementById('preco_venda').value) || 0;
+
+    const vImposto  = venda * impPct / 100;
+    const vComissao = venda * comPct / 100;
+    const vOutros   = venda * outrosPct / 100;
+    const totalDed  = custo + fixo + vImposto + vComissao + taxaFixa + vOutros;
+    const lucro     = venda - totalDed;
+    const margem    = venda > 0 ? (lucro / venda) * 100 : 0;
+
+    const totalPctDed  = impPct + comPct + outrosPct;
+    const custosFixos  = custo + fixo + taxaFixa;
+    const be   = precoMeta(0,  custosFixos, totalPctDed);
+    const m20  = precoMeta(20, custosFixos, totalPctDed);
+    const m30  = precoMeta(30, custosFixos, totalPctDed);
+    const m40  = precoMeta(40, custosFixos, totalPctDed);
+
+    const badge = faixaAtual === 0 ? 'Personalizado' : venda > 0 && venda < 50 ? 'Faixa < R$50' : 'Faixa ≥ R$50';
+    document.getElementById('badge-faixa').textContent = badge;
+
+    const cls = lucro > 0 ? 'pos' : lucro < 0 ? 'neg' : 'warn';
+
+    document.getElementById('r-lucro').textContent    = (lucro < 0 ? '- ' : '') + brl(lucro);
+    document.getElementById('r-lucro').className      = 'metric-value ' + cls;
+    document.getElementById('r-margem').textContent   = pct(margem);
+    document.getElementById('r-margem').className     = 'metric-value ' + cls;
+    document.getElementById('r-deducoes').textContent = brl(totalDed);
+
+    document.getElementById('b-venda').textContent    = brl(venda);
+    document.getElementById('b-custo').textContent    = '- ' + brl(custo);
+    document.getElementById('b-fixo').textContent     = '- ' + brl(fixo);
+    document.getElementById('b-imposto').textContent  = '- ' + brl(vImposto) + ' (' + pct(impPct) + ')';
+    document.getElementById('b-comissao').textContent = '- ' + brl(vComissao) + ' (' + pct(comPct) + ')';
+    document.getElementById('b-taxa').textContent     = '- ' + brl(taxaFixa);
+    document.getElementById('b-outros').textContent   = outrosPct > 0 ? '- ' + brl(vOutros) + ' (' + pct(outrosPct) + ')' : 'R$ 0,00';
+
+    document.getElementById('b-lucro-total').textContent  = (lucro < 0 ? '- ' : '') + brl(lucro);
+    document.getElementById('b-lucro-total').className    = 'brow-total-val ' + cls;
+
+    document.getElementById('r-breakeven').textContent = isFinite(be)  ? brl(be)  : '—';
+    document.getElementById('r-meta20').textContent    = isFinite(m20) ? brl(m20) : '—';
+    document.getElementById('r-meta30').textContent    = isFinite(m30) ? brl(m30) : '—';
+    document.getElementById('r-meta40').textContent    = isFinite(m40) ? brl(m40) : '—';
+
+    const ad = document.getElementById('alerta-danger');
+    const aw = document.getElementById('alerta-warning');
+    ad.classList.remove('show');
+    aw.classList.remove('show');
+    if (lucro < 0) {
+      ad.classList.add('show');
+      document.getElementById('alerta-danger-txt').textContent =
+        'Prejuízo de ' + brl(Math.abs(lucro)) + ' por unidade. Preço mínimo para cobrir todos os custos: ' + brl(be) + '.';
+    } else if (margem < 10) {
+      aw.classList.add('show');
+      document.getElementById('alerta-warning-txt').textContent =
+        'Margem baixa (' + pct(margem) + '). Avalie se cobre riscos como devoluções e inadimplência.';
+    }
+  }
+</script>
+</body>
+</html>
